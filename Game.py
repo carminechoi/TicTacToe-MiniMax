@@ -2,19 +2,16 @@
 
 # Carmine Choi
 # July 16, 2019
-
 import os
 import pygame
 import Pipe
 import Bird
 import Constants
 
-os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (600, 200)
-
 
 class Game:
 
-    def __init__(self):
+    def __init__(self, best_score):
 
         global win
         win = pygame.display.set_mode((Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))
@@ -48,6 +45,7 @@ class Game:
         ### ----------------------- ###
 
         self.score = 0
+        self.best_score = best_score
 
         self.ground1_posx = -168
         self.ground2_posx = 168
@@ -67,6 +65,31 @@ class Game:
 
         self.clock = pygame.time.Clock()
 
+    def draw_best_score(self):
+        best_score = [int(i) for i in str(self.best_score)]
+        length = len(best_score)
+        for i in range(length):
+            if best_score[i] == 0:
+                win.blit(self.zero, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 1:
+                win.blit(self.one, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12 + 4), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 2:
+                win.blit(self.two, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 3:
+                win.blit(self.three, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 4:
+                win.blit(self.four, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 5:
+                win.blit(self.five, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 6:
+                win.blit(self.six, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 7:
+                win.blit(self.seven, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 8:
+                win.blit(self.eight, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+            elif best_score[i] == 9:
+                win.blit(self.nine, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
+
     def draw_score(self):
         # break score into single digits
         score = [int(i) for i in str(self.score)]
@@ -77,7 +100,7 @@ class Game:
             if score[i] == 0:
                 win.blit(self.zero, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
             elif score[i] == 1:
-                win.blit(self.one, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12 + 8), Constants.SCORE_HEIGHT))
+                win.blit(self.one, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12 + 4), Constants.SCORE_HEIGHT))
             elif score[i] == 2:
                 win.blit(self.two, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
             elif score[i] == 3:
@@ -132,6 +155,9 @@ class Game:
         for i in range(len(self.pipes)):
             self.pipes[i].update_pipe()
             if self.pipes[i].is_collision(self.bird[0]):
+                if self.score > self.best_score:
+                    self.best_score = self.score
+                    print(self.best_score)
                 self.game_over = True
                 break
             elif self.pipes[i].pos_X == Constants.BIRD_X - 17:
@@ -161,6 +187,8 @@ class Game:
 
         # draw score
         self.draw_score()
+        # draw best score
+        self.draw_best_score()
 
         # update the screen
         pygame.display.flip()
@@ -186,7 +214,7 @@ class Game:
 
                 if event.type == pygame.KEYDOWN:
                     self.game_over = False
-                    self.__init__()
+                    self.__init__(self.best_score)
                     self.game_loop()
 
         pygame.quit()
@@ -196,6 +224,7 @@ class Game:
 
 
 if __name__ == '__main__':
-    game = Game()
+    best_score = 0
+    game = Game(best_score)
     game.run()
 
