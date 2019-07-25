@@ -6,7 +6,7 @@ class Bird:
     def __init__(self, win, downflap, midflap, upflap):
         self.win = win
 
-        self.bird_x = 120
+        self.bird_x = Constants.BIRD_X
         self.bird_y = 200
 
         self.downflap = downflap
@@ -19,6 +19,7 @@ class Bird:
         self.jump_count = 0
         self.is_jump = False
 
+    # cycle through flap images
     def flap_animation(self):
         if self.flap_count == 0:
             self.flap = self.midflap
@@ -31,6 +32,8 @@ class Bird:
             self.flap_count = 0
         self.flap_count += 1
 
+    # STILL NEEDS WORK
+    # handles bird rotation animation
     def bird_animation(self, direction):
         if direction == 1:
             if self.flap_count == 0:
@@ -50,6 +53,7 @@ class Bird:
         self.rect.center = (x, y)  # Put the new rect's center at old center.
         self.flap = self.rotate_flap
 
+    # jump if 'space' is pressed
     def jump(self):
         key = pygame.key.get_pressed()
         if key[pygame.K_SPACE]:
@@ -58,17 +62,19 @@ class Bird:
                 self.jump_count = 8
         if self.is_jump:
             if self.jump_count >= 0:
+                # jump based on quadratic equation for hang time effect
                 self.bird_y -= (self.jump_count ** 2) * 0.1
-                # self.bird_y -= self.jump_count * .6
                 self.jump_count -= .25
             else:
                 self.jump_count = 8
                 self.is_jump = False
 
+    # drops brid when it's not jumping by GRAVITY amount
     def gravity(self):
         if not self.is_jump:
             self.bird_y += Constants.GRAVITY
 
+    # if bird reaches the ground, end game
     def is_game_over(self):
         if self.bird_y >= Constants.SCREEN_HEIGHT - 130:
             return True
@@ -80,5 +86,6 @@ class Bird:
         self.flap_rect = pygame.Rect(self.bird_x, self.bird_y, 34, 24)
 
     def draw_bird(self):
-        pygame.draw.rect(self.win, (0, 255, 0), (self.bird_x, self.bird_y, 34, 24))
+        # for collision testing
+        # pygame.draw.rect(self.win, (0, 255, 0), (self.bird_x, self.bird_y, 34, 24))
         self.win.blit(self.flap, (self.bird_x, self.bird_y))
