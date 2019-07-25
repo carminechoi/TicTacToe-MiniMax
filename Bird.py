@@ -1,38 +1,32 @@
 import pygame
-import math
 import Constants
 
 
 class Bird:
-    def __init__(self, win):
+    def __init__(self, win, downflap, midflap, upflap):
         self.win = win
-
-        self.downflap = Constants.downflap.convert_alpha()
-        self.midflap = Constants.midflap.convert_alpha()
-        self.upflap = Constants.upflap.convert_alpha()
-        self.flap = Constants .midflap.convert_alpha()
-
-        self.flap_count = 0
 
         self.bird_x = 120
         self.bird_y = 200
 
-        self.rotate_flap = self.flap
-        self.rect = self.rotate_flap.get_rect()
-        self.rect.center = (self.bird_x, self.bird_y)
-        self.angle = 4
+        self.downflap = downflap
+        self.midflap = midflap
+        self.upflap = upflap
+        self.flap = self.midflap
+        self.flap_rect = pygame.Rect(self.bird_x, self.bird_y, 34, 24)
 
+        self.flap_count = 0
         self.jump_count = 0
         self.is_jump = False
 
     def flap_animation(self):
         if self.flap_count == 0:
             self.flap = self.midflap
-        elif self.flap_count == 20:
+        elif self.flap_count == 15:
             self.flap = self.downflap
-        elif self.flap_count == 40:
+        elif self.flap_count == 30:
             self.flap = self.midflap
-        elif self.flap_count == 60:
+        elif self.flap_count == 45:
             self.flap = self.upflap
             self.flap_count = 0
         self.flap_count += 1
@@ -83,6 +77,8 @@ class Bird:
         self.flap_animation()
         self.jump()
         self.gravity()
+        self.flap_rect = pygame.Rect(self.bird_x, self.bird_y, 34, 24)
 
     def draw_bird(self):
+        pygame.draw.rect(self.win, (0, 255, 0), (self.bird_x, self.bird_y, 34, 24))
         self.win.blit(self.flap, (self.bird_x, self.bird_y))
