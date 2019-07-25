@@ -5,104 +5,119 @@
 
 import os
 import pygame
+import Pipe
+import Bird
+import Constants
+
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (600, 200)
 
 
-# Global Variables
+class Game:
 
-SCREEN_WIDTH = 288
-SCREEN_HEIGHT = 512
+    def __init__(self):
 
-def game_loop():
-    print("hello")
+        global win
+        win = pygame.display.set_mode((Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))
+
+        self.ground1_posx = -168
+        self.ground2_posx = 168
+        self.ground_posy = 400
+
+        self.bird = list()
+        self.bird.append(Bird.Bird(win))
+
+        self.pipe_timer = 0
+
+        self.game_over = False
+        self.pipes = list()
+        self.pipes.append(Pipe.Pipe(win))
+
+        self.clock = pygame.time.Clock()
+
+    def game_loop(self):
+        while not self.game_over:
+            for event in pygame.event.get():
+                # if exit is pressed
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+            # MOVE GROUND
+            if self.ground1_posx <= -335:
+                self.ground1_posx = -168
+            else:
+                self.ground1_posx -= Constants.SPEED
+            if self.ground2_posx <= 1:
+                self.ground2_posx = 168
+            else:
+                self. ground2_posx -= Constants.SPEED
+
+            self.update()
+            self.draw()
+
+    def update(self):
+        if self.pipe_timer == Constants.PIPE_TIMER:
+            self.pipes.append(Pipe.Pipe(win))
+            self.pipe_timer = 0
+        else:
+            self.pipe_timer += 1
+
+        for i in range(len(self.pipes)):
+            self.pipes[i].update_pipe()
+
+        if self.pipes[0].pos_X <= -100:
+            self.pipes.pop(0)
+
+        for i in range(len(self.bird)):
+            self.bird[i].update_bird()
+            if self.bird[i].is_game_over():
+                self.game_over = True
+
+    def draw(self):
+        win.blit(Constants.background, (0, 0))
+
+        for i in range(len(self.bird)):
+            self.bird[i].draw_bird()
+
+        for i in range(len(self.pipes)):
+            self.pipes[i].draw_pipe()
+
+        win.blit(Constants.ground1.convert_alpha(), (self.ground1_posx, self.ground_posy))
+        win.blit(Constants.ground2.convert_alpha(), (self.ground2_posx, self.ground_posy))
+
+        pygame.display.flip()
+        self.clock.tick(Constants.FPS)
 
 
-def main_menu():
+    def start_screen(self):
 
-    win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        icon = pygame.image.load('Assets/elisha.jpg').convert_alpha()
 
-    background = pygame.image.load('Assets/background.png')
-    background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption('Blappy Fird')
+        pygame.display.set_icon(icon)
 
-    ground = pygame.image.load('Assets/ground.png')
-    ground = pygame.transform.scale(ground, (SCREEN_WIDTH, 112))
+        run = True
+        while run:
+            win.blit(Constants.background, (0, 0))
+            win.blit(Constants.ground1, (0, 400))
+            win.blit(Constants.message, ((Constants.SCREEN_WIDTH - 184) / 2, 90))
 
-    icon = pygame.image.load('Assets/elisha.jpg')
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
 
-    pygame.display.set_caption('Blappy Fird')
-    pygame.display.set_icon(icon)
+                if event.type == pygame.KEYDOWN:
+                    self.game_over = False
+                    self.game_loop()
 
-    run = True
-    while run:
-        win.blit(background, (0, 0))
-        win.blit(ground, (0, 400))
+        pygame.quit()
 
-        pygame.display.update()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-
-            if event.type == pygame.KEYDOWN:
-                print("Hello World")
-    pygame.quit()
+    def run(self):
+        self.start_screen()
 
 
-main_menu()
+if __name__ == '__main__':
+    game = Game()
+    game.run()
 
-
-
-# class Window:
-#     def __init__(self):
-#         self.x = 100
-#         self.y = 50
-#         self.width = 540
-#         self.height = 960
-#         self.win = pygame.display.set_mode((self.width, self.height))
-#
-#     def display(self):
-#         os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (self.x, self.y)
-#
-#         icon = pygame.image.load('elisha.jpg')
-#
-#         pygame.display.set_caption("Blappy Fird")
-#         pygame.display.set_icon(icon)
-#
-# class Blappy:
-#     def __init__(self):
-#         self.x = 50
-#         self.y = 440
-#         self.width = 50
-#         self.height = 50
-#         self.vel = 10
-#
-#     def checkKeyPress(self):
-#         keys = pygame.key.get_pressed()
-#
-#         if keys[pygame.K_SPACE]:
-#             self.y += self.vel
-#
-#     def updateBlappy(self):
-#         pygame.draw.rect(self.win, (255, 0, 0), (self.x, self.y, self.width, self.height))
-#
-#
-# # set window starting position (x,y)
-#
-# window = Window()
-# blappy = Blappy()
-#
-# window.display()
-# run = True
-# while run:
-#     pygame.time.delay(50)
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             run = False
-#
-#     blappy.checkKeyPress()
-#
-#     # Update Block
-#     win.fill((0, 0, 0))
-#     blappy.updateBlappy()
-#
-#     pygame.display.update()
-#
-# pygame.quit()
