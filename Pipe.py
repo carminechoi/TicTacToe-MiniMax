@@ -13,7 +13,7 @@ class Pipe:
 
         self.pos_X = 350
 
-        self.gap_height = 450
+        self.gap_height = Constants.PIPE_GAP
         self.pos_upper_Y = -200
         self.pos_lower_Y = self.pos_upper_Y + self.gap_height
 

@@ -25,7 +25,7 @@ class Game:
         self.ground1 = pygame.image.load('Assets/ground.png').convert_alpha()
         self.ground2 = pygame.image.load('Assets/ground.png').convert_alpha()
 
-        self.message = pygame.image.load('Assets/message.png').convert_alpha()
+        self.message = pygame.image.load('Assets/message1.png').convert_alpha()
 
         self.downflap = pygame.image.load('Assets/bluebird-downflap.png').convert_alpha()
         self.midflap = pygame.image.load('Assets/bluebird-midflap.png').convert_alpha()
@@ -131,8 +131,10 @@ class Game:
         # update each pipe and check collision
         for i in range(len(self.pipes)):
             self.pipes[i].update_pipe()
-            self.pipes[i].is_collision(self.bird[0])
-            if self.pipes[i].pos_X == Constants.BIRD_X - 17:
+            if self.pipes[i].is_collision(self.bird[0]):
+                self.game_over = True
+                break
+            elif self.pipes[i].pos_X == Constants.BIRD_X - 17:
                 self.score += 1
 
         # update each bird
@@ -184,6 +186,7 @@ class Game:
 
                 if event.type == pygame.KEYDOWN:
                     self.game_over = False
+                    self.__init__()
                     self.game_loop()
 
         pygame.quit()
