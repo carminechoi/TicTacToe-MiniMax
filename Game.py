@@ -1,230 +1,209 @@
+class Board:
 
+    def __init__(self):
+        self.board = [
+            ['1', '2', '3'],
+            ['4', '5', '6'],
+            ['7', '8', '9']]
+        self.x = 0
+        self.y = 0
+        self.is_player_turn = True
 
-# Carmine Choi
-# July 16, 2019
-import os
-import pygame
-import Pipe
-import Bird
-import Constants
+    def PrintBoard(self):
+        print("      |      |      ")
+        print("  " + self.board[0][0] + "   |   " + self.board[0][1] + "  |   " + self.board[0][2] + "  ")
+        print("      |      |      ")
+        print("-----------------")
+        print("      |      |      ")
+        print("  " + self.board[1][0] + "   |   " + self.board[1][1] + "  |   " + self.board[1][2] + "  ")
+        print("      |      |      ")
+        print("-----------------")
+        print("      |      |      ")
+        print("  " + self.board[2][0] + "   |   " + self.board[2][1] + "  |   " + self.board[2][2] + "  ")
+        print("      |      |      ")
+        print()
 
-
-class Game:
-
-    def __init__(self, best_score):
-
-        global win
-        win = pygame.display.set_mode((Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))
-        ###   LOADING IMAGE ASSETS   ###
-        self.background = pygame.image.load('Assets/background.png').convert_alpha()
-        self.background = pygame.transform.scale(self.background, (Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT))
-
-        self.ground1 = pygame.image.load('Assets/ground.png').convert_alpha()
-        self.ground2 = pygame.image.load('Assets/ground.png').convert_alpha()
-
-        self.message = pygame.image.load('Assets/message1.png').convert_alpha()
-
-        self.downflap = pygame.image.load('Assets/bluebird-downflap.png').convert_alpha()
-        self.midflap = pygame.image.load('Assets/bluebird-midflap.png').convert_alpha()
-        self.upflap = pygame.image.load('Assets/bluebird-upflap.png').convert_alpha()
-
-        self.lower_pipe = pygame.image.load('Assets/pipe.png').convert_alpha()
-        self.upper_pipe = pygame.image.load('Assets/pipe.png').convert_alpha()
-        self.upper_pipe = pygame.transform.rotate(self.upper_pipe, 180)
-
-        self.zero = pygame.image.load('Assets/0.png').convert_alpha()
-        self.one = pygame.image.load('Assets/1.png').convert_alpha()
-        self.two = pygame.image.load('Assets/2.png').convert_alpha()
-        self.three = pygame.image.load('Assets/3.png').convert_alpha()
-        self.four = pygame.image.load('Assets/4.png').convert_alpha()
-        self.five = pygame.image.load('Assets/5.png').convert_alpha()
-        self.six = pygame.image.load('Assets/6.png').convert_alpha()
-        self.seven = pygame.image.load('Assets/7.png').convert_alpha()
-        self.eight = pygame.image.load('Assets/8.png').convert_alpha()
-        self.nine = pygame.image.load('Assets/9.png').convert_alpha()
-        ### ----------------------- ###
-
-        self.score = 0
-        self.best_score = best_score
-
-        self.ground1_posx = -168
-        self.ground2_posx = 168
-        self.ground_posy = 400
-
-        # initialize bird object
-        self.bird = list()
-        self.bird.append(Bird.Bird(win, self.downflap, self.midflap, self.upflap))
-
-        #initialize pipe object
-        self.pipes = list()
-        self.pipes.append(Pipe.Pipe(win, self.lower_pipe, self.upper_pipe))
-
-        self.pipe_timer = 0
-
-        self.game_over = False
-
-        self.clock = pygame.time.Clock()
-
-    def draw_best_score(self):
-        best_score = [int(i) for i in str(self.best_score)]
-        length = len(best_score)
-        for i in range(length):
-            if best_score[i] == 0:
-                win.blit(self.zero, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 1:
-                win.blit(self.one, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12 + 4), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 2:
-                win.blit(self.two, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 3:
-                win.blit(self.three, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 4:
-                win.blit(self.four, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 5:
-                win.blit(self.five, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 6:
-                win.blit(self.six, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 7:
-                win.blit(self.seven, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 8:
-                win.blit(self.eight, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-            elif best_score[i] == 9:
-                win.blit(self.nine, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT + 40))
-
-    def draw_score(self):
-        # break score into single digits
-        score = [int(i) for i in str(self.score)]
-        length = len(score)
-
-        # draw score accordingly
-        for i in range(length):
-            if score[i] == 0:
-                win.blit(self.zero, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 1:
-                win.blit(self.one, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12 + 4), Constants.SCORE_HEIGHT))
-            elif score[i] == 2:
-                win.blit(self.two, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 3:
-                win.blit(self.three, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 4:
-                win.blit(self.four, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 5:
-                win.blit(self.five, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 6:
-                win.blit(self.six, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 7:
-                win.blit(self.seven, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 8:
-                win.blit(self.eight, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-            elif score[i] == 9:
-                win.blit(self.nine, (Constants.SCORE_WIDTH / 2 + ((i * 2.2) * 12), Constants.SCORE_HEIGHT))
-
-    # main game loop
-    def game_loop(self):
-        while not self.game_over:
-            for event in pygame.event.get():
-                # if exit is pressed
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-
-            # MOVE GROUND
-            if self.ground1_posx <= -335:
-                self.ground1_posx = -168
-            else:
-                self.ground1_posx -= Constants.SPEED
-            if self.ground2_posx <= 1:
-                self.ground2_posx = 168
-            else:
-                self. ground2_posx -= Constants.SPEED
-
-            self.update()
-            self.draw()
-
-    def update(self):
-        # controlls pipe spawning
-        if self.pipe_timer == Constants.PIPE_TIMER:
-            self.pipes.append(Pipe.Pipe(win, self.lower_pipe, self.upper_pipe))
-            self.pipe_timer = 0
+    def FillSpace(self):
+        if self.is_player_turn:
+            self.board[self.x][self.y] = "X"
         else:
-            self.pipe_timer += 1
-        # remove pipe when its offscreen
-        if self.pipes[0].pos_X <= -100:
-            self.pipes.pop(0)
+            self.board[self.x][self.y] = "O"
 
-        # update each pipe and check collision
-        for i in range(len(self.pipes)):
-            self.pipes[i].update_pipe()
-            if self.pipes[i].is_collision(self.bird[0]):
-                if self.score > self.best_score:
-                    self.best_score = self.score
-                    print(self.best_score)
-                self.game_over = True
-                break
-            elif self.pipes[i].pos_X == Constants.BIRD_X - 17:
-                self.score += 1
+    def ConvertSpace(self, space):
+        if space == 1:
+            self.x = 0
+            self.y = 0
+        elif space == 2:
+            self.x = 0
+            self.y = 1
+        elif space == 3:
+            self.x = 0
+            self.y = 2
+        elif space == 4:
+            self.x = 1
+            self.y = 0
+        elif space == 5:
+            self.x = 1
+            self.y = 1
+        elif space == 6:
+            self.x = 1
+            self.y = 2
+        elif space == 7:
+            self.x = 2
+            self.y = 0
+        elif space == 8:
+            self.x = 2
+            self.y = 1
+        elif space == 9:
+            self.x = 2
+            self.y = 2
 
-        # update each bird
-        for i in range(len(self.bird)):
-            self.bird[i].update_bird()
-            if self.bird[i].is_game_over():
-                self.game_over = True
+    def CheckWin(self):
+        # check if previous move caused a win on vertical line
+        if self.board[0][self.y] == self.board[1][self.y] == self.board[2][self.y]:
+            return True
 
-    def draw(self):
-        # draw background
-        win.blit(self.background, (0, 0))
+        # check if previous move caused a win on horizontal line
+        if self.board[self.x][0] == self.board[self.x][1] == self.board[self.x][2]:
+            return True
 
-        # draw each bird
-        for i in range(len(self.bird)):
-            self.bird[i].draw_bird()
+        # check if previous move was on the main diagonal and caused a win
+        if self.x == self.y and self.board[0][0] == self.board[1][1] == self.board[2][2]:
+            return True
 
-        # draw each pipe
-        for i in range(len(self.pipes)):
-            self.pipes[i].draw_pipe()
+        # check if previous move was on the secondary diagonal and caused a win
+        if self.x + self.y == 2 and self.board[0][2] == self.board[1][1] == self.board[2][0]:
+            return True
 
-        # draw ground over pipe
-        win.blit(self.ground1, (self.ground1_posx, self.ground_posy))
-        win.blit(self.ground2, (self.ground2_posx, self.ground_posy))
+        return False
 
-        # draw score
-        self.draw_score()
-        # draw best score
-        self.draw_best_score()
-
-        # update the screen
-        pygame.display.flip()
-        self.clock.tick(Constants.FPS)
-
-    def start_screen(self):
-
-        icon = pygame.image.load('Assets/elisha.jpg')
-
-        pygame.display.set_caption('Blappy Fird')
-        pygame.display.set_icon(icon)
-
-        run = True
-        while run:
-            win.blit(self.background, (0, 0))
-            win.blit(self.ground1, (0, 400))
-            win.blit(self.message, ((Constants.SCREEN_WIDTH - 184) / 2, 90))
-
-            pygame.display.update()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-
-                if event.type == pygame.KEYDOWN:
-                    self.game_over = False
-                    self.__init__(self.best_score)
-                    self.game_loop()
-
-        pygame.quit()
-
-    def run(self):
-        self.start_screen()
+    def isMovesLeft(self):
+        for i in range(3):
+            for j in range(3):
+                if self.board[i][j] is not "O" and self.board[i][j] is not "X":
+                    return True
+        return False
 
 
-if __name__ == '__main__':
-    best_score = 0
-    game = Game(best_score)
-    game.run()
+# IF THE WINNER IS "O" THEN RETURN 10
+def evaluate(b):
+    for row in range(3):
+        if b.board[row][0] == b.board[row][1] == b.board[row][2]:
+            if b.board[row][0] == "O":
+                return 5
+            elif b.board[row][0] == "X":
+                return -5
+    for col in range(3):
+        if b.board[0][col] == b.board[1][col] == b.board[2][col]:
+            if b.board[0][col] == "O":
+                return 5
+            elif b.board[0][col] == "X":
+                return -5
+    if b.board[0][0] == b.board[1][1] == b.board[2][2]:
+        if b.board[0][0] == "O":
+            return 5
+        elif b.board[0][0] == "X":
+            return -5
+    if b.board[0][2] == b.board[1][1] == b.board[2][0]:
+        if b.board[0][2] == "O":
+            return 5
+        elif b.board[0][2] == "X":
+            return -5
+    return 0
 
+
+def minimax(b, depth, isMax):
+    score = evaluate(b)
+
+    if score is 5:
+        return score
+    if score is -5:
+        return score
+    if not b.isMovesLeft():
+        return 0
+
+    if isMax:
+        best = -1000
+
+        for i in range(3):
+            for j in range(3):
+                if b.board[i][j] is not "O" and b.board[i][j] is not "X":
+                    temp = b.board[i][j]
+                    b.board[i][j] = "O"
+
+                    best = max(best,
+                               minimax(b, depth + 1, not isMax)) + depth
+                    b.board[i][j] = temp
+        return best
+    else:
+        best = 1000
+
+        for i in range(3):
+            for j in range(3):
+                if b.board[i][j] is not "O" and b.board[i][j] is not "X":
+                    temp = b.board[i][j]
+                    b.board[i][j] = "X"
+
+                    best = min(best,
+                               minimax(b, depth + 1, not isMax)) - depth
+                    b.board[i][j] = temp
+        return best
+
+
+def SuperiorRobotMove(b):
+    bestVal = -1000
+    bestMove = (-1, -1)
+
+    for i in range(3):
+        for j in range(3):
+            if b.board[i][j] is not "O" and b.board[i][j] is not "X":
+                temp = b.board[i][j]
+                b.board[i][j] = "O"
+
+                moveVal = minimax(b, 0, False)
+
+                b.board[i][j] = temp
+
+                if moveVal > bestVal:
+                    bestMove = (i, j)
+                    bestVal = moveVal
+    print(bestMove)
+    return bestMove
+
+
+def PlayGame(b):
+    is_over = False
+    while not is_over:
+        if b.is_player_turn:
+            space = int(input("Select a Space Bitch: "))
+            b.ConvertSpace(space)
+            if b.board[b.x][b.y] is not "X" and b.board[b.x][b.y] is not "O":
+                b.FillSpace()
+                b.is_player_turn = False
+            else:
+                print("That's not a Valid Space Idiot")
+        else:
+            move = SuperiorRobotMove(b)
+            b.x = move[0]
+            b.y = move[1]
+            b.FillSpace()
+            b.is_player_turn = True
+
+        b.PrintBoard()
+        if b.CheckWin():
+            if b.is_player_turn:
+                print("RoBoT Wins!")
+            else:
+                print("Player Wins!")
+            is_over = True
+        else:
+            if not b.isMovesLeft():
+                print("DRAW!")
+                is_over = True
+
+
+if __name__ == "__main__":
+    gameBoard = Board()
+    print("Welcome to Carmine's TicTacToe")
+    gameBoard.PrintBoard()
+    PlayGame(gameBoard)
